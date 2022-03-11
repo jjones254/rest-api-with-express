@@ -24,7 +24,7 @@ router.post('/users', asyncHandler(async (req, res) => {
   try {
     await User.create(req.body);
     res.location('/');
-    res.status(201).json({ "message": "Account successfully created!" });
+    res.status(201)
   } catch (error) {
     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
       const errors = error.errors.map(err => err.message);
@@ -37,12 +37,29 @@ router.post('/users', asyncHandler(async (req, res) => {
 
 // course routes
 router.get('/courses', asyncHandler(async (req, res) => {
-  const courses = await Course.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] } });
+  const courses = await Course.findAll({
+    attributes: {
+      exclude: ['createdAt', 'updatedAt']
+    },
+    include: {
+      model: User,
+      attributes:['firstName', 'lastName', 'emailAddress']
+    }
+  });
   await res.status(200).json(courses);
 }));
 
 router.get('/courses/:id', asyncHandler(async (req, res) => {
-  const course = await Course.findByPk(req.params.id, { attributes: { exclude: ['createdAt', 'updatedAt'] } });
+  const course = await Course.findByPk(
+    req.params.id, { 
+    attributes: {
+      exclude: ['createdAt', 'updatedAt'] 
+    },
+    include: {
+      model: User,
+      attributes:['firstName', 'lastName', 'emailAddress']
+    } 
+  });
   res.status(200).json(course);
 }));
 
